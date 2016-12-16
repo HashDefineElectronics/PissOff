@@ -213,7 +213,7 @@ void onInterrupt()
 	if (normalizedDifference >= _signalThreshold) {
 		++_positiveSignals; // Count the positive signals.
 		_negativeSignals = 0;
-		SimpleIO::setSignal(true);
+		//SimpleIO::setSignal(true);
 	} else {
 		++_negativeSignals; // Count the negative signals.
 		if (_negativeSignals >= 2) {

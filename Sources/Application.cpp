@@ -398,16 +398,32 @@ void errorMode()
 ///
 void playSound()
 {
-	// Read the current sound file from the file directory.
-	const SDCard::DirectoryEntry *file = SDCard::fileAtIndex(_nextPlayedFileIndex);
-	if (file == nullptr) {
-		_nextPlayedFileIndex = 0;
-		file = SDCard::fileAtIndex(_nextPlayedFileIndex);
+
+	while(true) {
+		// Read the current sound file from the file directory.
+		const SDCard::DirectoryEntry *file = SDCard::fileAtIndex(_nextPlayedFileIndex);
+		if (file == nullptr) {
+			_nextPlayedFileIndex = 0;
+			file = SDCard::fileAtIndex(_nextPlayedFileIndex);
+		}
+		++_nextPlayedFileIndex;
+		// Play the sound file.
+		SimpleSerial::sendLine(file->fileName);
+
+		if (file->fileName[0] == 'm' ) {
+			// this is a talking clip so make sure that the santa starts moving
+			SimpleIO::setSignal(true);
+		}
+
+		AudioPlayer::playSound(file->startBlock, file->fileSize);
+
+		SimpleIO::setSignal(false);
+
+		if (file->fileName[0] != 's' ) {
+			// this is a talking clip so make sure that the santa starts moving
+			break;
+		}
 	}
-	++_nextPlayedFileIndex;
-	// Play the sound file.
-	SimpleSerial::sendLine(file->fileName);
-	AudioPlayer::playSound(file->startBlock, file->fileSize);
 }
 
 
@@ -520,7 +536,8 @@ void endRawSensorDump()
 ///
 void onBlinkInterrupt()
 {
-	SimpleIO::toggleSignal();
+
+	//SimpleIO::toggleSignal();
 }
 
 
